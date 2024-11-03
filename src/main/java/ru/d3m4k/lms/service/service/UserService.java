@@ -24,7 +24,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByLogin(username);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
                         String.format("Пользователь %s не найден", username)
                 ));
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getLogin(),
                 user.getPassword(),
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
         );
@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
     public User createNewUser(RegistrationUserDto registrationUserDto) {
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());
-        user.setUsername(registrationUserDto.getUsername());
+        user.setLogin(registrationUserDto.getUsername());
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
         user.setRoles(List.of(roleService.getUserRole()));
         return userRepository.save(user);

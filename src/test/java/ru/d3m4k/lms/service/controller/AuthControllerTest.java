@@ -30,7 +30,7 @@ class AuthControllerTest {
     @SneakyThrows
     void shouldAuthorizeUserSuccessfully() {
         String jsonBody = "    {\n" +
-                "        \"username\": \"user\",\n" +
+                "        \"login\": \"user\",\n" +
                 "        \"password\": \"100\"\n" +
                 "    }";
 
@@ -60,7 +60,7 @@ class AuthControllerTest {
     @SneakyThrows
     void shouldAuthorizeAdminSuccessfully() {
         String jsonBody = "    {\n" +
-                "        \"username\": \"admin\",\n" +
+                "        \"login\": \"admin\",\n" +
                 "        \"password\": \"100\"\n" +
                 "    }";
 
