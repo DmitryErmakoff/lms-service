@@ -12,48 +12,55 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.d3m4k.lms.service.util.CustomUserDetails;
 import ru.d3m4k.lms.service.util.JwtTokenUtil;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
+
     private final JwtTokenUtil jwtTokenUtil;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            try {
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
                 username = jwtTokenUtil.getUsername(jwt);
-            } catch (ExpiredJwtException e) {
-                log.debug("Время жизни токена вышло");
-            } catch (SignatureException e) {
-                log.debug("Подпись неправильная");
             }
+        } catch (ExpiredJwtException e) {
+            log.debug("Token lifetime expired");
+        } catch (SignatureException e) {
+            log.debug("Invalid token signature");
         }
 
-        // Сделать проверку что данные в базе актуальны с токеном (что бы токен не жил при удаление)
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    username,
+            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
                     null,
-                    jwtTokenUtil.getRoles(jwt).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                    userDetails.getAuthorities()
             );
-            SecurityContextHolder.getContext().setAuthentication(token);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request, response);
     }
 }

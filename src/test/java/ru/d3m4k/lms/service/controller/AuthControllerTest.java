@@ -5,11 +5,9 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import ru.d3m4k.lms.service.entity.TokenResponse;
-import ru.d3m4k.lms.service.repository.UserRepository;
+import ru.d3m4k.lms.service.dto.TokenResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

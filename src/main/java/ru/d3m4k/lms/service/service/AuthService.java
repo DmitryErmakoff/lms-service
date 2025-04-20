@@ -12,7 +12,7 @@ import ru.d3m4k.lms.service.dto.JwtRequest;
 import ru.d3m4k.lms.service.dto.JwtResponse;
 import ru.d3m4k.lms.service.dto.RegistrationUserDto;
 import ru.d3m4k.lms.service.entity.User;
-import ru.d3m4k.lms.service.entity.UserDto;
+import ru.d3m4k.lms.service.dto.UserDto;
 import ru.d3m4k.lms.service.exception.AppError;
 import ru.d3m4k.lms.service.util.JwtTokenUtil;
 
@@ -39,11 +39,13 @@ public class AuthService {
         if (!registrationUserDto.getPassword().equals(registrationUserDto.getConfirmPassword())) {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пароли не совпадают"), HttpStatus.BAD_REQUEST);
         }
-
-        if (userService.findByUsername(registrationUserDto.getUsername()).isPresent()) {
+        if (userService.findByUsername(registrationUserDto.getLogin()).isPresent()) {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанным именем уже существует"), HttpStatus.BAD_REQUEST);
         }
+        if (userService.findByEmail(registrationUserDto.getEmail()).isPresent()) {
+            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанны email уже существует"), HttpStatus.BAD_REQUEST);
+        }
         User user = userService.createNewUser(registrationUserDto);
-        return ResponseEntity.ok(new UserDto(user.getId(), user.getLogin(), user.getEmail()));
+        return ResponseEntity.ok(new UserDto(user.getId(), user.getLogin(), user.getEmail(), user.getCreatedAt()));
     }
 }

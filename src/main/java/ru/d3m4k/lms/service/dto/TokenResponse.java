@@ -1,4 +1,4 @@
-package ru.d3m4k.lms.service.entity;
+package ru.d3m4k.lms.service.dto;
 
 import lombok.Data;
 

@@ -34,6 +34,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/secured").authenticated()
+                        .requestMatchers("/api/groups/group").authenticated()
+                        .requestMatchers("/api/groups/**").hasRole("ADMIN")
+                        .requestMatchers("/api/groups/users/unassigned").hasRole("ADMIN")
                         .requestMatchers("/info").authenticated()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()

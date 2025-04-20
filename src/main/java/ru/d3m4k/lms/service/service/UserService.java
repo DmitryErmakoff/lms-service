@@ -2,7 +2,6 @@ package ru.d3m4k.lms.service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.d3m4k.lms.service.dto.RegistrationUserDto;
 import ru.d3m4k.lms.service.entity.User;
 import ru.d3m4k.lms.service.repository.UserRepository;
+import ru.d3m4k.lms.service.util.CustomUserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -27,26 +28,36 @@ public class UserService implements UserDetailsService {
         return userRepository.findByLogin(username);
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username).
-                orElseThrow(() -> new UsernameNotFoundException(
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь %s не найден", username)
                 ));
-        return new org.springframework.security.core.userdetails.User(
+
+        return new CustomUserDetails(
+                user.getEmail(),
                 user.getLogin(),
                 user.getPassword(),
-                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
+                user.getCreatedAt(),
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                        .collect(Collectors.toList())
         );
     }
 
     public User createNewUser(RegistrationUserDto registrationUserDto) {
         User user = new User();
         user.setEmail(registrationUserDto.getEmail());
-        user.setLogin(registrationUserDto.getUsername());
+        user.setLogin(registrationUserDto.getLogin());
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
         user.setRoles(List.of(roleService.getUserRole()));
+        user.setCreatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 }
