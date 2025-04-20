@@ -24,7 +24,9 @@ public class ModelMapperConfig {
                 .addMappings(m -> m.map(GroupRequestDto::getName, Group::setName));
 
         mapper.createTypeMap(User.class, UserDto.class)
-                .addMappings(m -> m.map(User::getLogin, UserDto::setLogin));
+                .addMappings(m -> m.map(User::getLogin, UserDto::setLogin))
+                .addMappings(m -> m.map(User::getFirstName, UserDto::setFirstname));
+
 
         mapper.createTypeMap(Group.class, StudentsFromGroupResponseDto.class)
                 .addMappings(m -> m.map(Group::getUsers, StudentsFromGroupResponseDto::setUsers));

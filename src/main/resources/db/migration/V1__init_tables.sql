@@ -14,6 +14,9 @@ CREATE TABLE Groups (
 -- Основная таблица пользователей
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,        -- Фамилия (surname)
+    first_name VARCHAR(50) NOT NULL,           -- Имя (name)
+    middle_name VARCHAR(50),             -- Отчество (middleName)
     login VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -106,7 +109,8 @@ CREATE TABLE Consultations (
     teacher_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    scheduled_at TIMESTAMP NOT NULL,
+    starts_at TIMESTAMP NOT NULL,
+    ends_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (teacher_id) REFERENCES Users(id) ON DELETE CASCADE
 );
@@ -116,8 +120,27 @@ CREATE TABLE Consultation_Groups (
     id SERIAL PRIMARY KEY,
     consultation_id INT NOT NULL,
     group_id INT NOT NULL,
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_consultation_group UNIQUE (consultation_id, group_id),
     FOREIGN KEY (consultation_id) REFERENCES Consultations(id) ON DELETE CASCADE,
     FOREIGN KEY (group_id) REFERENCES Groups(id) ON DELETE CASCADE
 );
+
+-- Новая таблица дисциплин
+CREATE TABLE Disciplines (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Teacher_Disciplines (
+    teacher_id INT NOT NULL REFERENCES Users(id),
+    discipline_id INT NOT NULL REFERENCES Disciplines(id),
+    PRIMARY KEY (teacher_id, discipline_id)
+);
+
+-- Добавляем дисциплину к заданиям
+ALTER TABLE Tasks ADD COLUMN discipline_id INT NOT NULL REFERENCES Disciplines(id) ON DELETE CASCADE;
+
+-- Добавляем дисциплину к консультациям
+ALTER TABLE Consultations ADD COLUMN discipline_id INT NOT NULL REFERENCES Disciplines(id) ON DELETE CASCADE;

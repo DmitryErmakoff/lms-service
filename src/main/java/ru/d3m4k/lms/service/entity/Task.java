@@ -34,5 +34,7 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<TaskGroup> taskGroups = new ArrayList<>();
 
-    // Getters, setters, constructors
+    @ManyToOne
+    @JoinColumn(name = "discipline_id", nullable = false)
+    private Discipline discipline;
 }

@@ -20,7 +20,4 @@ public class ConsultationGroup {
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
-
-    @Column(name = "assigned_at")
-    private LocalDateTime assignedAt;
 }

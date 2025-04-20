@@ -19,17 +19,23 @@ public class Consultation {
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
+    @ManyToOne
+    @JoinColumn(name = "discipline_id", nullable = false)
+    private Discipline discipline;
+
     private String title;
     private String description;
 
-    @Column(name = "scheduled_at", nullable = false)
-    private LocalDateTime scheduledAt;
+    @Column(name = "starts_at", nullable = false)
+    private LocalDateTime startsAt;
+
+    @Column(name = "ends_at", nullable = false)
+    private LocalDateTime endsAt;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
     private List<ConsultationGroup> consultationGroups = new ArrayList<>();
-
 }
 

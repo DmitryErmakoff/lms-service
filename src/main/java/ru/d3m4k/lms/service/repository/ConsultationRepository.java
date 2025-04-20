@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface ConsultationRepository extends CrudRepository<Consultation, Long> {
     List<Consultation> findByTeacherId(Long teacherId);
-    List<Consultation> findByScheduledAtBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -15,6 +13,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    @Column(nullable = false, length = 50)
+    private String surname;
+
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
 
     @Column(unique = true, nullable = false, length = 50)
     private String login;
@@ -40,6 +47,14 @@ public class User {
     )
     private Collection<Role> roles;
 
+    @ManyToMany
+    @JoinTable(
+            name = "teacher_disciplines",
+            joinColumns = @JoinColumn(name = "teacher_id"),
+            inverseJoinColumns = @JoinColumn(name = "discipline_id")
+    )
+    private Set<Discipline> disciplines = new HashSet<>();
+
     @OneToMany(mappedBy = "teacher")
     private List<Material> materials = new ArrayList<>();
 
@@ -48,10 +63,6 @@ public class User {
 
     @OneToMany(mappedBy = "uploadedBy")
     private List<File> files = new ArrayList<>();
-
-    // Getters, setters, constructors
 }
 
 
-
-//  private Collection<Role> roles;

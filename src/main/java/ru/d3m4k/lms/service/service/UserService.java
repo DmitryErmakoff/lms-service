@@ -47,7 +47,11 @@ public class UserService implements UserDetailsService {
                 user.getCreatedAt(),
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.getName()))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                user.getFirstName(),
+                user.getSurname(),
+                user.getMiddleName(),
+                user.getId()
         );
     }
 
@@ -58,6 +62,9 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
         user.setRoles(List.of(roleService.getUserRole()));
         user.setCreatedAt(LocalDateTime.now());
+        user.setFirstName(registrationUserDto.getFirstName());
+        user.setSurname(registrationUserDto.getSurname());
+        user.setMiddleName(registrationUserDto.getMiddleName());
         return userRepository.save(user);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.d3m4k.lms.service.dto.JwtRequest;
@@ -15,6 +16,8 @@ import ru.d3m4k.lms.service.entity.User;
 import ru.d3m4k.lms.service.dto.UserDto;
 import ru.d3m4k.lms.service.exception.AppError;
 import ru.d3m4k.lms.service.util.JwtTokenUtil;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,9 @@ public class AuthService {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Пользователь с указанны email уже существует"), HttpStatus.BAD_REQUEST);
         }
         User user = userService.createNewUser(registrationUserDto);
-        return ResponseEntity.ok(new UserDto(user.getId(), user.getLogin(), user.getEmail(), user.getCreatedAt()));
+        var roles = user.getRoles().stream()
+                .map(role -> new String(role.getName()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new UserDto(user.getId(), user.getFirstName(), user.getSurname(), user.getMiddleName(), user.getLogin(), user.getEmail(), user.getCreatedAt(), roles));
     }
 }

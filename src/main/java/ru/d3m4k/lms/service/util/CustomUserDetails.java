@@ -9,19 +9,38 @@ import java.util.Collection;
 
 @Data
 public class CustomUserDetails implements UserDetails {
-    private String email;
+    private Long id;
     private String username;
+    private String firstName;
+    private String surname;
+    private String middleName;
+    private String email;
     private String password;
     private LocalDateTime createdAt;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String email, String username, String password, LocalDateTime createdAt, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(
+            String email,
+            String login,
+            String password,
+            LocalDateTime createdAt,
+            Collection<? extends GrantedAuthority> authorities,
+            String firstName,
+            String surname,
+            String middleName,
+            Long id
+    ) {
         this.email = email;
-        this.username = username;
+        this.username = login;
         this.password = password;
         this.createdAt = createdAt;
         this.authorities = authorities;
+        this.firstName = firstName;
+        this.surname = surname;
+        this.middleName = middleName;
+        this.id = id;
     }
+
 
     @Override
     public String getUsername() {
