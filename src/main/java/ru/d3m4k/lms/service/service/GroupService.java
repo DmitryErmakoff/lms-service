@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import ru.d3m4k.lms.service.dto.GroupRequestDto;
-import ru.d3m4k.lms.service.dto.GroupResponseDto;
-import ru.d3m4k.lms.service.dto.StudentsFromGroupResponseDto;
-import ru.d3m4k.lms.service.dto.UserDto;
+import ru.d3m4k.lms.service.dto.*;
 import ru.d3m4k.lms.service.entity.Group;
 import ru.d3m4k.lms.service.entity.User;
 import ru.d3m4k.lms.service.exception.ResourceConflictException;
@@ -111,6 +108,35 @@ public class GroupService {
 
         user.setGroup(null);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public GroupResponseDto updateGroup(Long groupId, GroupUpdateRequestDto dto) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Группа не найдена"));
+
+        groupRepository.findByName(dto.getName())
+                .ifPresent(existingGroup -> {
+                    if (!existingGroup.getId().equals(groupId)) {
+                        throw new ResourceConflictException(
+                                "Группа с названием '%s' уже существует (ID: %d)"
+                                        .formatted(dto.getName(), existingGroup.getId())
+                        );
+                    }
+                });
+
+        group.setName(dto.getName());
+        Group updatedGroup = groupRepository.save(group);
+
+        return modelMapper.map(updatedGroup, GroupResponseDto.class);
+    }
+
+    @Transactional
+    public void deleteGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Группа не найдена"));
+
+        groupRepository.delete(group);
     }
 
     public List<UserDto> getUsersWithoutGroup() {

@@ -7,7 +7,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import ru.d3m4k.lms.service.dto.TokenResponse;
+import ru.d3m4k.lms.service.dto.TokenResponseDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,11 +40,11 @@ class AuthControllerTest {
                 .post("http://localhost:8080/auth")
                 .andReturn();
 
-        TokenResponse tokenResponse = objectMapper.readValue(response.getBody().asString(), TokenResponse.class);
+        TokenResponseDto tokenResponseDto = objectMapper.readValue(response.getBody().asString(), TokenResponseDto.class);
 
         Response authToUser = RestAssured
                 .given()
-                .header("Authorization", "Bearer " + tokenResponse.getToken())
+                .header("Authorization", "Bearer " + tokenResponseDto.getToken())
                 .when()
                 .get("http://localhost:8080/secured")
                 .andReturn();
@@ -70,11 +70,11 @@ class AuthControllerTest {
                 .post("http://localhost:8080/auth")
                 .andReturn();
 
-        TokenResponse tokenResponse = objectMapper.readValue(response.getBody().asString(), TokenResponse.class);
+        TokenResponseDto tokenResponseDto = objectMapper.readValue(response.getBody().asString(), TokenResponseDto.class);
 
         Response authToAdmin = RestAssured
                 .given()
-                .header("Authorization", "Bearer " + tokenResponse.getToken())
+                .header("Authorization", "Bearer " + tokenResponseDto.getToken())
                 .body(response.getBody().asString())
                 .when()
                 .get("http://localhost:8080/admin");

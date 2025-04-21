@@ -1,5 +1,9 @@
 package ru.d3m4k.lms.service.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,16 +37,29 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/secured").authenticated()
+                        // Public endpoints
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-resources/*",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        // Disciplines endpoints
+                        .requestMatchers("/api/disciplines/my").authenticated()
+                        .requestMatchers("/api/disciplines/**").hasRole("ADMIN")
+                        // Groups endpoints
                         .requestMatchers("/api/groups/group").authenticated()
                         .requestMatchers("/api/groups/**").hasRole("ADMIN")
-                        .requestMatchers("/api/groups/users/unassigned").hasRole("ADMIN")
-                        .requestMatchers("/info").authenticated()
+                        // Other endpoints
+                        .requestMatchers("/secured").authenticated()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .anyRequest().permitAll())
-                .sessionManagement((sessionManagment) -> sessionManagment.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                        .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

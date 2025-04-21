@@ -5,7 +5,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,4 +25,7 @@ public class Group {
 
     @OneToMany(mappedBy = "group")
     private List<User> users = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "groups")
+    private Set<Discipline> disciplines = new HashSet<>();
 }

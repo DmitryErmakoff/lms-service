@@ -2,6 +2,8 @@ package ru.d3m4k.lms.service.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -9,9 +11,11 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "first_name", length = 50)
@@ -53,6 +57,8 @@ public class User {
             joinColumns = @JoinColumn(name = "teacher_id"),
             inverseJoinColumns = @JoinColumn(name = "discipline_id")
     )
+    @ToString.Exclude  // Важно!
+    @EqualsAndHashCode.Exclude  // Исключаем из hashCode/equals
     private Set<Discipline> disciplines = new HashSet<>();
 
     @OneToMany(mappedBy = "teacher")

@@ -9,9 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.d3m4k.lms.service.dto.JwtRequest;
-import ru.d3m4k.lms.service.dto.JwtResponse;
+import ru.d3m4k.lms.service.dto.JwtRequestDto;
+import ru.d3m4k.lms.service.dto.JwtResponseDto;
 import ru.d3m4k.lms.service.dto.RegistrationUserDto;
+import ru.d3m4k.lms.service.entity.Role;
 import ru.d3m4k.lms.service.entity.User;
 import ru.d3m4k.lms.service.dto.UserDto;
 import ru.d3m4k.lms.service.exception.AppError;
@@ -27,7 +28,7 @@ public class AuthService {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
 
-    public ResponseEntity<?> createAuthToken(JwtRequest authRequest) {
+    public ResponseEntity<?> createAuthToken(JwtRequestDto authRequest) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getLogin(), authRequest.getPassword()));
         } catch (BadCredentialsException e) {
@@ -35,7 +36,7 @@ public class AuthService {
         }
         UserDetails userDetails = userService.loadUserByUsername(authRequest.getLogin());
         String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponseDto(token));
     }
 
     public ResponseEntity<?> createUser(RegistrationUserDto registrationUserDto) {
@@ -50,7 +51,7 @@ public class AuthService {
         }
         User user = userService.createNewUser(registrationUserDto);
         var roles = user.getRoles().stream()
-                .map(role -> new String(role.getName()))
+                .map(Role::getName)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new UserDto(user.getId(), user.getFirstName(), user.getSurname(), user.getMiddleName(), user.getLogin(), user.getEmail(), user.getCreatedAt(), roles));
     }

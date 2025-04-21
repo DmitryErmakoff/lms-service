@@ -1,5 +1,6 @@
 package ru.d3m4k.lms.service.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findByGroupId(Long groupId);
     @Query("SELECT u FROM User u WHERE u.group IS NULL")
     List<User> findUsersWithoutGroup();
+    @EntityGraph(attributePaths = {"roles", "group"})
+    Optional<User> findUserWithRolesAndGroupById(Long id);
 }
