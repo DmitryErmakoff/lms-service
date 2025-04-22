@@ -6,14 +6,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.d3m4k.lms.service.dto.GroupResponseDto;
 import ru.d3m4k.lms.service.dto.UserDto;
+import ru.d3m4k.lms.service.dto.UserInfoDto;
+import ru.d3m4k.lms.service.entity.Group;
+import ru.d3m4k.lms.service.entity.User;
+import ru.d3m4k.lms.service.service.UserService;
 import ru.d3m4k.lms.service.util.CustomUserDetails;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class MainController {
+
+    private final UserService userService;
+
     @GetMapping("/unsecured")
     public String unsecured() {
         return "unsecured data";
@@ -29,9 +38,12 @@ public class MainController {
         return "admin data";
     }
 
+    // TODO отрефакторить
     @GetMapping("/info")
-    public UserDto userData(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return UserDto.builder()
+    public UserInfoDto userData(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+        Group group = user.getGroup();
+        UserInfoDto userInfoDto = UserInfoDto.builder()
                 .id(userDetails.getId())
                 .firstname(userDetails.getFirstName())
                 .surname(userDetails.getSurname())
@@ -45,7 +57,15 @@ public class MainController {
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList())
                 )
-                .middleName(userDetails.getMiddleName())
                 .build();
+        if (group != null) {
+            GroupResponseDto groupResponseDto = GroupResponseDto.builder()
+                    .id(user.getGroup().getId())
+                    .name(user.getGroup().getName())
+                    .createdAt(user.getGroup().getCreatedAt())
+                    .build();
+            userInfoDto.setGroup(groupResponseDto);
+        }
+        return userInfoDto;
     }
 }

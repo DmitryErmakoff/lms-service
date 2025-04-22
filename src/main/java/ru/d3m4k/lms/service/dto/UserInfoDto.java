@@ -6,12 +6,11 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class UserInfoDto {
     private Long id;
     private String firstname;
     private String surname;
@@ -21,5 +20,5 @@ public class UserDto {
     private LocalDateTime createdAt;
     @Null
     private List<String> roles;
-//    private GroupResponseDto group;
+    private GroupResponseDto group;
 }
