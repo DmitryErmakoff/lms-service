@@ -1,5 +1,11 @@
 server:
   port: 8080
+
+  servlet:
+    encoding:
+      force-response: true
+  tomcat:
+    uri-encoding: UTF-8
 jwt:
   secret: 984hg493gh0439rthr0429uruj2309yh937gc763fe87t3f89723gf
   lifetime: 10m
@@ -24,3 +30,9 @@ spring:
     enabled: true
     baseline-on-migrate: true
     validate-on-migrate: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+

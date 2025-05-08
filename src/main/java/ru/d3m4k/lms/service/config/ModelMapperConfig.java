@@ -4,9 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.d3m4k.lms.service.dto.FileResponse;
 import ru.d3m4k.lms.service.dto.GroupRequestDto;
 import ru.d3m4k.lms.service.dto.StudentsFromGroupResponseDto;
 import ru.d3m4k.lms.service.dto.UserDto;
+import ru.d3m4k.lms.service.entity.File;
 import ru.d3m4k.lms.service.entity.Group;
 import ru.d3m4k.lms.service.entity.User;
 
@@ -30,6 +32,13 @@ public class ModelMapperConfig {
 
         mapper.createTypeMap(Group.class, StudentsFromGroupResponseDto.class)
                 .addMappings(m -> m.map(Group::getUsers, StudentsFromGroupResponseDto::setUsers));
+
+        mapper.createTypeMap(File.class, FileResponse.class)
+                .addMappings(m -> m.map(File::getId, FileResponse::setId))
+                .addMappings(m -> m.map(File::getFileName, FileResponse::setFileName))
+                .addMappings(m -> m.map(src -> src.getUploadedBy().getId(), FileResponse::setUploadedBy))
+                .addMappings(m -> m.map(File::getCreatedAt, FileResponse::setCreatedAt));
+
 
         return mapper;
     }

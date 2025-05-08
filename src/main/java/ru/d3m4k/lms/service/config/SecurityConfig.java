@@ -43,6 +43,10 @@ public class SecurityConfig {
                                 "/swagger-resources/*",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        // Files endpoints
+                        .requestMatchers("/api/files").hasRole("ADMIN") // Только админ может загружать
+                        .requestMatchers("/api/files").hasRole("ADMIN") // Только админ получает список
+                        .requestMatchers("/api/files/**").authenticated() // Любой авторизованный может скачивать
                         // Disciplines endpoints
                         .requestMatchers("/api/disciplines/my").authenticated()
                         .requestMatchers("/api/disciplines/**").hasRole("ADMIN")
