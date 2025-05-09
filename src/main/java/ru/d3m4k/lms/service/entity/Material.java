@@ -16,8 +16,9 @@ public class Material {
     private String title;
     private String description;
 
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
+    @ManyToOne
+    @JoinColumn(name = "file_id")
+    private File file;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)

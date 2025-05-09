@@ -4,12 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.d3m4k.lms.service.dto.FileResponse;
-import ru.d3m4k.lms.service.dto.GroupRequestDto;
-import ru.d3m4k.lms.service.dto.StudentsFromGroupResponseDto;
-import ru.d3m4k.lms.service.dto.UserDto;
+import ru.d3m4k.lms.service.dto.*;
 import ru.d3m4k.lms.service.entity.File;
 import ru.d3m4k.lms.service.entity.Group;
+import ru.d3m4k.lms.service.entity.Material;
 import ru.d3m4k.lms.service.entity.User;
 
 @Configuration
@@ -39,6 +37,13 @@ public class ModelMapperConfig {
                 .addMappings(m -> m.map(src -> src.getUploadedBy().getId(), FileResponse::setUploadedBy))
                 .addMappings(m -> m.map(File::getCreatedAt, FileResponse::setCreatedAt));
 
+        mapper.createTypeMap(Material.class, MaterialResponse.class)
+                .addMappings(m -> m.map(Material::getId, MaterialResponse::setId))
+                .addMappings(m -> m.map(Material::getTitle, MaterialResponse::setTitle))
+                .addMappings(m -> m.map(Material::getDescription, MaterialResponse::setDescription))
+                .addMappings(m -> m.map(src -> src.getFile().getId(), MaterialResponse::setFileId))
+                .addMappings(m -> m.map(src -> src.getTeacher().getId(), MaterialResponse::setTeacherId))
+                .addMappings(m -> m.map(Material::getCreatedAt, MaterialResponse::setCreatedAt));
 
         return mapper;
     }

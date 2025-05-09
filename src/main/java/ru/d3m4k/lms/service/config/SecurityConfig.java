@@ -53,6 +53,9 @@ public class SecurityConfig {
                         // Groups endpoints
                         .requestMatchers("/api/groups/group").authenticated()
                         .requestMatchers("/api/groups/**").hasRole("ADMIN")
+                        // Material endpoints
+                        .requestMatchers("/api/materials").hasRole("ADMIN")
+                        .requestMatchers("/api/materials/**").authenticated()
                         // Other endpoints
                         .requestMatchers("/secured").authenticated()
                         .requestMatchers("/admin").hasRole("ADMIN")
