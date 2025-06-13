@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ru.d3m4k.lms.service.dto.*;
+import ru.d3m4k.lms.service.entity.Discipline;
 import ru.d3m4k.lms.service.entity.Group;
 import ru.d3m4k.lms.service.entity.User;
 import ru.d3m4k.lms.service.exception.ResourceConflictException;
 import ru.d3m4k.lms.service.exception.ResourceNotFoundException;
+import ru.d3m4k.lms.service.repository.DisciplineRepository;
 import ru.d3m4k.lms.service.repository.GroupRepository;
 import ru.d3m4k.lms.service.repository.UserRepository;
 
@@ -25,6 +27,7 @@ import static java.util.Objects.isNull;
 public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final DisciplineRepository disciplineRepository;
     private final ModelMapper modelMapper;
 
     public GroupResponseDto createGroup(GroupRequestDto dto) {
@@ -135,6 +138,11 @@ public class GroupService {
     public void deleteGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Группа не найдена"));
+
+        for (Discipline discipline: group.getDisciplines()) {
+            discipline.getGroups().remove(group);
+            disciplineRepository.save(discipline);
+        }
 
         groupRepository.delete(group);
     }
